@@ -1,30 +1,28 @@
-# agent-inference-stack
+# Multi Agent Dynamo LLM Orchestrator
 
 A production-ready multi-agent AI system with **Dynamo token batching**, **vLLM inference**, and **Kubernetes orchestration**.
 
 ## Architecture
 
 ```
-User Request
-     │
-     ▼
-┌─────────────────────────────────────────────────────────┐
-│                   FastAPI Gateway                        │
-│              POST /api/v1/process                        │
-└─────────────────────┬───────────────────────────────────┘
-                       │
+                     User Request                              
+                          ▼
+ ┌─────────────────────────────────────────────────────────┐
+ │                   FastAPI Gateway                       │
+ │              POST /api/v1/process                       │
+ └─────────────────────┬───────────────────────────────────┘
                        ▼
 ┌─────────────────────────────────────────────────────────┐
 │                   Orchestrator                          │
-│  ┌───────────┐  ┌─────────────┐  ┌──────────────────┐  │
-│  │ Planning  │→ │  Execution  │→ │   Validation     │  │
-│  │  Agent    │  │  Pipeline   │  │    Agent         │  │
-│  └───────────┘  └──────┬──────┘  └──────────────────┘  │
-│                         │                               │
-│               ┌─────────┼─────────┐                     │
-│               ▼         ▼         ▼                     │
-│          Research  Execution  Validation                 │
-│          Agents    Agents     Agents                     │
+│  ┌───────────┐  ┌─────────────┐  ┌──────────────────┐   │
+│  │ Planning  │→ │  Execution  │→ │   Validation     │   │
+│  │  Agent    │  │  Pipeline   │  │    Agent         │   │
+│  └───────────┘  └──────┬──────┘  └──────────────────┘   │
+│                        │                                │
+│               ┌────────┼─────────┐                      │
+│               ▼        ▼         ▼                      │
+│          Research  Execution  Validation                │
+│          Agents     Agents     Agents                   │
 └─────────────────────────────────────────────────────────┘
                        │
           ┌────────────┼────────────┐

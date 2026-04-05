@@ -1,0 +1,32 @@
+# Production overrides
+app:
+  environment: production
+  debug: false
+
+logging:
+  level: WARNING
+
+orchestrator:
+  max_concurrent_agents: 50
+  request_timeout_seconds: 300
+
+inference:
+  provider: vllm  # Use local vLLM in production
+  vllm:
+    tensor_parallel_size: 8
+    gpu_memory_utilization: 0.95
+  dynamo:
+    enabled: true
+
+storage:
+  redis:
+    max_connections: 200
+  postgres:
+    pool_size: 50
+    max_overflow: 25
+
+monitoring:
+  prometheus:
+    enabled: true
+  tracing:
+    enabled: true

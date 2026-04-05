@@ -1,0 +1,92 @@
+# Default application settings
+
+app:
+  name: agent-inference-stack
+  version: "0.1.0"
+  environment: development
+  debug: false
+  host: "0.0.0.0"
+  port: 8000
+
+logging:
+  level: INFO
+  format: json
+  output: stdout
+  include_request_id: true
+
+orchestrator:
+  max_concurrent_agents: 10
+  request_timeout_seconds: 300
+  max_retries: 3
+  retry_delay_seconds: 1
+  retry_backoff_multiplier: 2.0
+
+agents:
+  planning:
+    model: claude-sonnet-4-6
+    temperature: 0.1
+    max_tokens: 4096
+    timeout_seconds: 60
+  research:
+    model: claude-haiku-4-5-20251001
+    temperature: 0.3
+    max_tokens: 2048
+    timeout_seconds: 120
+    max_search_queries: 4
+    max_results_per_query: 10
+  execution:
+    model: claude-sonnet-4-6
+    temperature: 0.2
+    max_tokens: 4096
+    timeout_seconds: 180
+    max_tool_calls: 20
+  validation:
+    model: claude-haiku-4-5-20251001
+    temperature: 0.1
+    max_tokens: 1024
+    timeout_seconds: 30
+    min_score_threshold: 0.7
+
+inference:
+  provider: anthropic  # anthropic | openai | vllm
+  vllm:
+    host: localhost
+    port: 8080
+    model: meta-llama/Llama-2-70b-chat-hf
+    tensor_parallel_size: 4
+    gpu_memory_utilization: 0.90
+    max_batch_size: 32
+    max_sequence_length: 4096
+  dynamo:
+    enabled: false
+    optimize_batch_schedule: true
+    prefill_cluster: hopper
+    decode_cluster: blackwell
+
+storage:
+  redis:
+    host: localhost
+    port: 6379
+    db: 0
+    max_connections: 50
+    request_ttl_seconds: 86400  # 24 hours
+  postgres:
+    host: localhost
+    port: 5432
+    database: agent_inference_stack
+    pool_size: 20
+    max_overflow: 10
+
+monitoring:
+  prometheus:
+    enabled: true
+    port: 9090
+  tracing:
+    enabled: false
+    jaeger_host: localhost
+    jaeger_port: 6831
+
+costs:
+  input_cost_per_1k_tokens: 0.003
+  output_cost_per_1k_tokens: 0.015
+  budget_alert_threshold_usd: 10.0

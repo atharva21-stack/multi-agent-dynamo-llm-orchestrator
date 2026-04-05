@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agent-inference-stack-config
+  namespace: agent-inference-stack
+data:
+  APP_ENV: "production"
+  LOG_LEVEL: "WARNING"
+  APP_PORT: "8000"
+  MAX_CONCURRENT_AGENTS: "50"
+  REQUEST_TIMEOUT_SECONDS: "300"
+  MAX_RETRIES: "3"
+  DEFAULT_MODEL: "claude-sonnet-4-6"
+  VLLM_HOST: "vllm-service"
+  VLLM_PORT: "8080"
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"
+  REDIS_DB: "0"
+  POSTGRES_HOST: "postgres-service"
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: "agent_inference_stack"
+  PROMETHEUS_PORT: "9090"

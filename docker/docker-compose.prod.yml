@@ -1,0 +1,78 @@
+# Production Docker Compose
+version: "3.9"
+
+services:
+  api:
+    image: ${DOCKER_REGISTRY}/agent-inference-stack-api:${VERSION:-latest}
+    deploy:
+      replicas: 3
+      resources:
+        limits:
+          cpus: "2"
+          memory: 4G
+        reservations:
+          cpus: "1"
+          memory: 2G
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - LOG_LEVEL=WARNING
+    env_file:
+      - .env.prod
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - agent-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
+
+  redis:
+    image: redis:7-alpine
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          memory: 2G
+    volumes:
+      - redis-data:/data
+    networks:
+      - agent-network
+
+  postgres:
+    image: postgres:15-alpine
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          memory: 4G
+    environment:
+      POSTGRES_DB: agent_inference_stack
+      POSTGRES_USER: agent_user
+    secrets:
+      - postgres_password
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - agent-network
+
+volumes:
+  redis-data:
+  postgres-data:
+
+networks:
+  agent-network:
+    driver: overlay
+
+secrets:
+  postgres_password:
+    external: true

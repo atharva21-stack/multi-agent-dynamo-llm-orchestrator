@@ -1,0 +1,44 @@
+# vLLM Inference Service Dockerfile (requires NVIDIA GPU)
+FROM nvidia/cuda:12.1.0-runtime-ubuntu22.04 as base
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3.11 \
+    python3.11-pip \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN ln -s /usr/bin/python3.11 /usr/bin/python3 && \
+    ln -s /usr/bin/python3.11 /usr/bin/python
+
+RUN groupadd --gid 1001 appgroup && \
+    useradd --uid 1001 --gid appgroup --shell /bin/bash --create-home appuser
+
+WORKDIR /app
+
+# Install vLLM and dependencies
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir \
+    vllm==0.2.0 \
+    torch>=2.1.0 \
+    transformers>=4.35.0 \
+    accelerate>=0.24.0
+
+# Cache directory for model weights
+RUN mkdir -p /models && chown appuser:appgroup /models
+
+RUN chown -R appuser:appgroup /app
+USER appuser
+
+EXPOSE 8080
+
+ENV HF_HOME=/models
+ENV PYTHONUNBUFFERED=1
+
+HEALTHCHECK --interval=30s --timeout=30s --start-period=120s --retries=5 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+CMD ["python", "-m", "vllm.entrypoints.openai.api_server", \
+     "--host", "0.0.0.0", \
+     "--port", "8080", \
+     "--model", "${VLLM_MODEL:-meta-llama/Llama-2-70b-chat-hf}", \
+     "--tensor-parallel-size", "${TENSOR_PARALLEL_SIZE:-4}"]

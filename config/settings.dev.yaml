@@ -1,0 +1,25 @@
+# Development overrides
+app:
+  environment: development
+  debug: true
+
+logging:
+  level: DEBUG
+
+orchestrator:
+  request_timeout_seconds: 600  # More time for debugging
+
+inference:
+  provider: anthropic  # Use Anthropic API in dev
+
+storage:
+  redis:
+    host: localhost
+  postgres:
+    host: localhost
+
+monitoring:
+  prometheus:
+    enabled: true
+  tracing:
+    enabled: false  # Disable tracing in dev

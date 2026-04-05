@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: agent-inference-stack
+  labels:
+    app.kubernetes.io/name: agent-inference-stack
+    app.kubernetes.io/version: "0.1.0"
